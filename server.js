@@ -1,0 +1,33 @@
+import express from 'express'
+
+const server = express()
+server.use(express.json())
+
+const products = []
+
+server.post('/products', (req, res) => {
+    const id = products.length + 1
+    const { name, price } = req.body
+    const newProduct = {id, ...req.body}
+    products.push(newProduct)
+    return res.status(201).json(newProduct)
+})
+
+server.get('/products', (req, res) => {
+    return res.json(products)
+})
+
+server.get('/products/:id', (req, res) => {
+    const productId = req.params.id
+    const product = products.find(p => p.id === Number(productId))
+    if(!product){
+        return res.status(404).json({message: 'Produto não encontrado'})
+    }
+
+    return res.json(product)
+    
+})
+
+server.listen(3020, () => {
+    console.log("Servidor Rodando na porta 3020")
+})
