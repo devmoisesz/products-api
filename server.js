@@ -19,15 +19,26 @@ server.get('/products', (req, res) => {
 
 server.get('/products/:id', (req, res) => {
     const productId = req.params.id
-    const product = products.find(p => p.id === Number(productId))
-    if(!product){
+    const IDproduct = products.find(p => p.id === Number(productId))
+    if(!IDproduct){
         return res.status(404).json({message: 'Produto não encontrado'})
     }
 
     return res.json(product)
     
 })
+server.put('/products/:id', (req, res) => {
+    const productId = req.params.id
+    const product = products.find(p => p.id === Number(productId))
+    const { name, price } = req.body
 
+    if(!product){
+        return res.status(404).json({message: 'Produto não encontrado'})
+    }
+    product.name = name || product.name
+    product.price = price || product.price
+    return res.status(200).json(product)
+})
 server.listen(3020, () => {
     console.log("Servidor Rodando na porta 3020")
 })
