@@ -7,7 +7,7 @@ const products = []
 
 server.post('/products', (req, res) => {
     const id = products.length + 1
-    const { name, price } = req.body
+    const { name, price, descripition, category, stock} = req.body
     const newProduct = {id, ...req.body}
     products.push(newProduct)
     return res.status(201).json(newProduct)
@@ -30,13 +30,16 @@ server.get('/products/:id', (req, res) => {
 server.put('/products/:id', (req, res) => {
     const productId = req.params.id
     const product = products.find(p => p.id === Number(productId))
-    const { name, price } = req.body
+    const { name, price, descripition, category, stock } = req.body
 
     if(!product){
         return res.status(404).json({message: 'Produto não encontrado'})
     }
     product.name = name || product.name
     product.price = price || product.price
+    product.descripition = descripition || product.descripition
+    product.category = category || product.category
+    product.stock = stock || product.stock 
     return res.status(200).json(product)
 })
 server.delete('/products/:id', (req, res) => {
