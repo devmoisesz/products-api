@@ -1,57 +1,79 @@
 import express from 'express'
+import { PrismaClient } from '@prisma/client'
 
 const server = express()
+const prisma = new PrismaClient()
 server.use(express.json())
 
-const products = []
-
-server.post('/products', (req, res) => {
-    const id = products.length + 1
+server.post('/products', async (req, res) => {
     const { name, price, descripition, category, stock} = req.body
-    const newProduct = {id, ...req.body}
-    products.push(newProduct)
+
+    const newProduct = await prisma.product.create({
+        data: {
+        name,
+        price,
+        descripition,
+        category,
+        stock,
+        }
+    })
+    
     return res.status(201).json(newProduct)
 })
 
-server.get('/products', (req, res) => {
+server.get('/products', async (req, res) => {
+    const products = await prisma.product.findMany()
     return res.json(products)
 })
 
-server.get('/products/:id', (req, res) => {
+server.get('/products/:id', async (req, res) => {
     const productId = req.params.id
-    const product = products.find(p => p.id === Number(productId))
+    const product = await prisma.product.findUnique({
+        where: { id: Number(productId)}
+    })
     if(!product){
-        return res.status(404).json({message: 'Produto não encontrado'})
+        return res.status(404).json({message: 'Product not found'})
     }
 
-    return res.json(product)
-    
+    return res.json(products)
 })
-server.put('/products/:id', (req, res) => {
+server.put('/products/:id', async (req, res) => {
     const productId = req.params.id
-    const product = products.find(p => p.id === Number(productId))
     const { name, price, descripition, category, stock } = req.body
-
-    if(!product){
-        return res.status(404).json({message: 'Produto não encontrado'})
+    const products = await prisma.product.findUnique({
+        where: { id: Number(productId)}
+    })
+    if(!products){
+        return res.status(404).json({message: 'Product not found'})
     }
-    product.name = name || product.name
-    product.price = price || product.price
-    product.descripition = descripition || product.descripition
-    product.category = category || product.category
-    product.stock = stock || product.stock 
-    return res.status(200).json(product)
+    const upProduct = await prisma.product.update({
+        where: {id: Number(productId)},
+        data:{
+            name,
+            price,
+            descripition,
+            category,
+            stock,
+        }
+    })
+    
+    return res.status(200).json(upProduct)
 })
-server.delete('/products/:id', (req, res) => {
+server.delete('/products/:id', async (req, res) => {
     const productId = req.params.id
-    const product = products.find(p => p.id === Number(productId))
-    if(!product){
+    const products = await prisma.product.findUnique({
+        where: {id: Number(productId)}
+    })
+    if(!products){
         return res.status(404).json({message: 'Produto não encontrado'})
     }
-    const posArray = products.findIndex(n => n.id === Number(productId))
-    products.splice(posArray, 1)
+    const product = await prisma.product.delete({
+        where: { id: Number(productId)}
+    })
+    
     return res.status(200).json({message: 'Produto Apagado com sucesso!'})
 })
+
 server.listen(3020, () => {
     console.log("Servidor Rodando na porta 3020")
 })

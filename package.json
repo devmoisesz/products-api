@@ -1,16 +1,10 @@
 {
-  "name": "api-produtos",
-  "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "Moisés",
-  "license": "ISC",
   "type": "module",
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
   "dependencies": {
-    "express": "^5.2.1"
+    "@prisma/client": "^5.22.0",
+    "express": "^5.1.0"
   }
 }
